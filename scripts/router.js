@@ -2,10 +2,14 @@
 
 export const router = {};
 
+// For quick access to body/header elements
+let body = document.querySelector("body");
+let header = document.querySelector("header h1");
+
 /**
  * Changes the "page" (state) that your SPA app is currently set to
  */
-router.setState = function() {
+router.setState = function(newState, goingBack) {
   /**
    * - There are three states that your SPA app will have
    *    1. The home page
@@ -35,4 +39,46 @@ router.setState = function() {
    *    1. You may add as many helper functions in this file as you like
    *    2. You may modify the parameters of setState() as much as you like
    */
+
+  // Handle change of state to home page
+  if (newState == null || newState.name == 'home') {
+    // Update body & header
+    body.className = ''; 
+    header.innerHTML = 'Journal Entries';
+
+    // Only add state to history if user didn't revert to previous state
+    if (!goingBack) {
+      history.pushState(newState, '', location.origin); 
+    }
+  }
+
+  // Handle change of state to settings page
+  else if (newState.name == 'settings') {
+    // Update body & header
+    body.className = 'settings';
+    header.innerHTML = 'Settings'; 
+
+    // Only add state to history if user didn't revert to previous state
+    if (!goingBack) {
+      history.pushState(newState, '', '#settings');  
+    }
+  }
+
+  // Handle change of state to single entry page
+  else if (newState.name == 'entry') {
+    // Update body & header
+    body.className = 'single-entry'; 
+    header.innerHTML = 'Entry ' + newState.id;
+
+    // Create & display specific entry
+    let newEntry = document.createElement('entry-page');
+    newEntry.entry = document.getElementById(newState.id).entry;
+    body.removeChild(document.getElementsByTagName("entry-page")[0]);
+    body.appendChild(newEntry);
+
+    // Only add state to history if user didn't revert to previous state
+    if (!goingBack) {
+      history.pushState(newState, '', '#entry' + newState.id);
+    }
+  }
 }
